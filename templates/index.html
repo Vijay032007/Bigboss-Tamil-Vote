@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% block content %}
+<section class="hero"><p class="eyebrow">FAN VOTING ARENA</p><h1>BIGG BOSS <em>TAMIL 10</em></h1><p>Support your favourite contestant. One vote per day on this browser.</p></section>
+{% if week %}<section class="section-head"><div><p class="eyebrow">CURRENT POLL</p><h2>{{week.title}}</h2></div><span class="status">● Voting open</span></section>
+{% if voted %}<div class="notice">Your vote for today has already been recorded. Come back tomorrow!</div>{% endif %}
+<div class="contestants">{% for c in contestants %}<article class="contestant"><div class="avatar">{% if c.photo_url %}<img src="{{c.photo_url}}" alt="{{c.name}}">{% else %}<span>{{c.name[:1]|upper}}</span>{% endif %}</div><h3>{{c.name}}</h3><form method="post" action="/vote"><input type="hidden" name="contestant_id" value="{{c.id}}"><button {% if voted %}disabled{% endif %}>Vote for {{c.name}}</button></form><small>{{totals[c.id]}} votes</small></article>{% else %}<p>No contestants have been added yet.</p>{% endfor %}</div>
+<p class="muted center">Total votes this week: {{total_votes}}</p>
+{% else %}<div class="empty"><h2>Voting hasn't started yet</h2><p>The admin will publish the weekly nomination list here.</p></div>{% endif %}
+{% endblock %}
