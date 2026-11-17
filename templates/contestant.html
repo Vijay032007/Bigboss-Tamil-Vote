@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% block content %}
+<section class="hero compact"><p class="eyebrow">FAN POLL CONTESTANT</p><h1>{{contestant.name}}</h1><p>Bigg Boss Tamil 10 · {{week.title}}</p></section>
+<section class="panel center"><div class="avatar">{% if contestant.photo_url %}<img src="{{contestant.photo_url}}" alt="{{contestant.name}}">{% else %}<span>{{contestant.name[:1]|upper}}</span>{% endif %}</div><h2>{{contestant.name}}</h2><p>{{votes}} community votes · {{percentage}}% of this week's poll votes</p><p class="muted">These figures represent votes submitted to this unofficial fan poll, not official show voting.</p><p><a href="/week/{{week.week_number}}">See all {{week.title}} contestants</a></p><p><a href="/results">View community poll results</a></p></section>
+{% endblock %}

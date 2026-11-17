@@ -21,3 +21,13 @@
 - One vote per day is enforced per browser cookie, not per verified person. Clearing cookies or changing devices/browsers can bypass it.
 - Do not use official logos, contestant photos, or copyrighted show artwork unless you have permission.
 - SEO routes: `/robots.txt` and `/sitemap.xml`. Search ranking/indexing is not guaranteed.
+
+
+## SEO improvements included
+- Page-specific titles and meta descriptions for the homepage, weekly nomination pages, contestant pages, and results.
+- Canonical URLs, Open Graph metadata, and a Twitter summary card.
+- Dynamic sitemap containing the homepage, results, every published week, and each contestant page.
+- Internal links between weekly pages, contestant pages, and results.
+- Clear disclosure that this is an unofficial fan poll and that poll totals are not official programme results.
+
+After deployment, check `/sitemap.xml` and resubmit `sitemap.xml` in Google Search Console. Request indexing for the homepage and important week pages; Google controls crawling, indexing, and ranking timelines.

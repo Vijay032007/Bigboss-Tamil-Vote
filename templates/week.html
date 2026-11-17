@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block content %}
+<section class="hero compact"><p class="eyebrow">WEEKLY NOMINATION GUIDE</p><h1>{{week.title}}</h1><p>An unofficial fan-poll listing of the contestants entered by the site administrator.</p></section>
+<section class="panel"><h2>Contestants in this poll</h2>{% if contestants %}<div class="contestants">{% for c in contestants %}<article class="contestant"><div class="avatar">{% if c.photo_url %}<img src="{{c.photo_url}}" alt="{{c.name}}">{% else %}<span>{{c.name[:1]|upper}}</span>{% endif %}</div><h3><a href="/contestant/{{c.id}}">{{c.name}}</a></h3><small>{{counts[c.id]}} community votes</small></article>{% endfor %}</div>{% else %}<p>No contestants have been added to this week yet.</p>{% endif %}<p class="muted">Total community votes recorded for this week: {{total}}</p></section>
+<p><a href="/">Return to the current voting page</a> · <a href="/results">View poll results</a></p>
+<p class="muted">This is an unofficial fan poll. These listings and vote totals are not official programme nominations or results.</p>
+{% endblock %}

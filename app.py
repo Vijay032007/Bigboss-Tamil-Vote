@@ -70,23 +70,55 @@ def robots():
 @app.route("/sitemap.xml")
 def sitemap():
     base = request.url_root.rstrip("/")
+    urls = [f"{base}/", f"{base}/results"]
+    for week in VotingWeek.query.order_by(VotingWeek.week_number.desc()).all():
+        urls.append(f"{base}/week/{week.week_number}")
+        for contestant in Contestant.query.filter_by(week_id=week.id).all():
+            urls.append(f"{base}/contestant/{contestant.id}")
+    entries = "".join(f"<url><loc>{url}</loc></url>" for url in urls)
     xml = ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
            "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">"
-           f"<url><loc>{base}/</loc></url><url><loc>{base}/results</loc></url>"
-           "</urlset>")
+           + entries + "</urlset>")
     return xml, 200, {"Content-Type": "application/xml; charset=utf-8"}
 
 @app.route("/")
 def home():
     week = VotingWeek.query.filter_by(is_open=True).order_by(VotingWeek.week_number.desc()).first()
     if not week:
-        return render_template("index.html", week=None, contestants=[], totals={}, total_votes=0, voted=False)
+        return render_template("index.html", week=None, contestants=[], totals={}, total_votes=0, voted=False,
+                           page_title="Bigg Boss Tamil 10 Voting | Unofficial Fan Poll",
+                           meta_description="Vote in an unofficial Bigg Boss Tamil Season 10 fan poll. Explore nominated contestants and community voting results.")
     contestants = Contestant.query.filter_by(week_id=week.id).order_by(Contestant.name).all()
     totals = {c.id: Vote.query.filter_by(week_id=week.id, contestant_id=c.id).count() for c in contestants}
     total_votes = sum(totals.values())
     token = request.cookies.get("bb_voter")
     voted = bool(token and Vote.query.filter_by(voter_hash=hash_token(token), vote_date=india_today()).first())
-    return render_template("index.html", week=week, contestants=contestants, totals=totals, total_votes=total_votes, voted=voted)
+    return render_template("index.html", week=week, contestants=contestants, totals=totals, total_votes=total_votes, voted=voted,
+                           page_title=f"{week.title} | Bigg Boss Tamil 10 Fan Voting",
+                           meta_description=f"Explore the contestants nominated in {week.title} of this unofficial Bigg Boss Tamil 10 fan poll. Vote once per day per browser.")
+
+
+@app.route("/week/<int:week_number>")
+def week_detail(week_number):
+    week = VotingWeek.query.filter_by(week_number=week_number).first_or_404()
+    contestants = Contestant.query.filter_by(week_id=week.id).order_by(Contestant.name).all()
+    counts = {c.id: Vote.query.filter_by(week_id=week.id, contestant_id=c.id).count() for c in contestants}
+    total = sum(counts.values())
+    return render_template("week.html", week=week, contestants=contestants, counts=counts, total=total,
+                           page_title=f"{week.title} Nominations | Bigg Boss Tamil 10",
+                           meta_description=f"See the nominated contestants and fan poll information for {week.title}. This is an unofficial community poll.")
+
+@app.route("/contestant/<int:contestant_id>")
+def contestant_detail(contestant_id):
+    contestant = Contestant.query.get_or_404(contestant_id)
+    week = VotingWeek.query.get_or_404(contestant.week_id)
+    votes = Vote.query.filter_by(week_id=week.id, contestant_id=contestant.id).count()
+    total = Vote.query.filter_by(week_id=week.id).count()
+    percentage = round(votes * 100 / total, 1) if total else 0
+    return render_template("contestant.html", contestant=contestant, week=week, votes=votes,
+                           total=total, percentage=percentage,
+                           page_title=f"{contestant.name} | Bigg Boss Tamil 10 Fan Poll",
+                           meta_description=f"View {contestant.name}'s listing in {week.title} of the unofficial Bigg Boss Tamil 10 fan poll.")
 
 @app.post("/vote")
 def cast_vote():
